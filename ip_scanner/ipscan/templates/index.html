@@ -177,6 +177,113 @@
     margin-top: 30px;
     line-height: 1.6;
   }
+  .ping-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .dot-small {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot-alive { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .dot-dead { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+  .btn-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .ssl-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--warn);
+  }
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .history-item:hover { color: var(--accent); }
+  .history-item:last-child { border-bottom: none; }
+  .history-meta { color: var(--text-dim); font-size: 12px; }
+  .status-tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .status-done { background: rgba(0,224,168,0.12); color: var(--accent); }
+  .status-cancelled { background: rgba(255,84,112,0.12); color: var(--danger); }
+  .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .preset-btn {
+    background: var(--panel-2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .preset-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+  .mono-box {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Consolas', monospace;
+    font-size: 12.5px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 340px;
+    overflow-y: auto;
+    color: var(--text);
+    margin-top: 12px;
+  }
+  .geo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .geo-item {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .geo-item .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+  .geo-item .value { font-size: 14px; color: var(--accent); margin-top: 2px; }
+  .subnet-host {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .subnet-host:last-child { border-bottom: none; }
+  .subnet-host .ip { color: var(--accent); font-weight: 600; }
+  .subnet-host .ports { color: var(--text-dim); font-size: 12px; margin-top: 3px; }
+  .dns-section { margin-top: 14px; }
+  .dns-section .dns-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12.5px;
+    color: var(--text);
+  }
+  .chip.primary { border-color: var(--accent-dim); color: var(--accent); }
+  .chip .rdns { color: var(--text-dim); font-size: 11px; }
+  .cname-chain { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+  .cname-chain .arrow { color: var(--text-dim); }
+  .engine-note { font-size: 11px; color: var(--text-dim); margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -184,7 +291,7 @@
   <header>
     <div class="dot"></div>
     <div>
-      <h1>IP Scanner <span style="color: var(--text-dim); font-size: 13px; font-weight: 400;">v0.1.0</span></h1>
+      <h1>IP Scanner <span style="color: var(--text-dim); font-size: 13px; font-weight: 400;">v0.1.1</span></h1>
       <span>IP çözümleme + hızlı port tarama paneli &middot; by TarikPro43391</span>
     </div>
   </header>
@@ -193,14 +300,99 @@
   <div class="card">
     <div class="row">
       <div class="field">
-        <label>Hedef (domain veya IP)</label>
-        <input id="resolveTarget" placeholder="example.com">
+        <label>Hedef (URL, domain veya IP)</label>
+        <input id="resolveTarget" placeholder="https://example.com/sayfa veya example.com">
       </div>
       <div class="field" style="flex: 0 0 140px; justify-content: flex-end;">
         <button onclick="resolveTarget()">IP Bul</button>
       </div>
+      <div class="field" style="flex: 0 0 140px; justify-content: flex-end;">
+        <button class="secondary" onclick="pingTarget()">Ping</button>
+      </div>
+      <div class="field" style="flex: 0 0 140px; justify-content: flex-end;">
+        <button class="secondary" onclick="geoipTarget()">GeoIP</button>
+      </div>
     </div>
     <div id="resolveResult"></div>
+    <div id="pingResult"></div>
+    <div id="geoResult"></div>
+  </div>
+
+  <!-- WHOIS -->
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label>WHOIS Sorgusu (domain veya IP)</label>
+        <input id="whoisTarget" placeholder="example.com">
+      </div>
+      <div class="field" style="flex: 0 0 140px; justify-content: flex-end;">
+        <button onclick="whoisLookup()" id="whoisBtn">Sorgula</button>
+      </div>
+    </div>
+    <div id="whoisError" class="error"></div>
+    <div id="whoisResult"></div>
+  </div>
+
+  <!-- Traceroute -->
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label>Traceroute Hedefi</label>
+        <input id="tracerouteTarget" placeholder="example.com">
+      </div>
+      <div class="field" style="flex: 0 0 140px; justify-content: flex-end;">
+        <button onclick="runTraceroute()" id="tracerouteBtn">Başlat</button>
+      </div>
+    </div>
+    <div id="tracerouteError" class="error"></div>
+    <div id="tracerouteResult"></div>
+  </div>
+
+  <!-- CIDR / Alt Ağ Tarama -->
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label>Alt Ağ (CIDR)</label>
+        <input id="subnetCidr" placeholder="192.168.1.0/24">
+      </div>
+      <div class="field small">
+        <label>Portlar</label>
+        <input id="subnetPorts" value="80,443,8080,8443,8000,8888">
+      </div>
+      <div class="field small">
+        <label>Timeout</label>
+        <input id="subnetTimeout" value="0.4">
+      </div>
+      <div class="field" style="flex: 0 0 160px; justify-content: flex-end;">
+        <button id="subnetBtn" onclick="startSubnetScan()">Alt Ağı Tara</button>
+      </div>
+    </div>
+    <div class="preset-row" id="subnetPresetRow"></div>
+    <div id="subnetError" class="error"></div>
+
+    <div id="subnetProgressSection" style="display:none;">
+      <div class="progress-outer"><div id="subnetProgressBar" class="progress-inner"></div></div>
+      <div class="status-row">
+        <span id="subnetProgressText">0 / 0 host tarandı</span>
+        <span id="subnetStatusText">çalışıyor...</span>
+      </div>
+    </div>
+
+    <div id="subnetResults"></div>
+    <div class="btn-row" id="subnetCancelRow" style="display:none;">
+      <button class="secondary" onclick="cancelSubnetScan()" id="subnetCancelBtn">Taramayı İptal Et</button>
+    </div>
+  </div>
+
+  <!-- Tarama Geçmişi -->
+  <div class="card">
+    <div class="row" style="align-items:center; margin-bottom: 8px;">
+      <div class="field"><label style="margin:0;">Tarama Geçmişi</label></div>
+      <div class="field" style="flex: 0 0 100px; justify-content: flex-end;">
+        <button class="secondary" onclick="loadHistory()">Yenile</button>
+      </div>
+    </div>
+    <div id="historyList"><div class="empty">Henüz tarama yapılmadı.</div></div>
   </div>
 
   <!-- Port Tarama -->
@@ -226,6 +418,7 @@
         <button id="scanBtn" onclick="startScan()">Taramayı Başlat</button>
       </div>
     </div>
+    <div class="preset-row" id="scanPresetRow"></div>
     <div id="scanError" class="error"></div>
 
     <div id="progressSection" style="display:none;">
@@ -243,6 +436,12 @@
       <tbody id="resultsBody"></tbody>
     </table>
     <div id="emptyState" class="empty" style="display:none;">Açık port bulunamadı.</div>
+
+    <div class="btn-row" id="postScanActions" style="display:none;">
+      <button class="secondary" onclick="cancelScan()" id="cancelBtn" style="display:none;">Taramayı İptal Et</button>
+      <button class="secondary" onclick="exportScan('json')" id="exportJsonBtn" style="display:none;">JSON İndir</button>
+      <button class="secondary" onclick="exportScan('csv')" id="exportCsvBtn" style="display:none;">CSV İndir</button>
+    </div>
   </div>
 
   <div class="footer-note">
@@ -253,11 +452,95 @@
 </div>
 
 <script>
+let currentScanId = null;
+
+async function pingTarget() {
+  const target = document.getElementById('resolveTarget').value.trim();
+  const pingDiv = document.getElementById('pingResult');
+  pingDiv.innerHTML = '';
+  if (!target) return;
+
+  pingDiv.innerHTML = `<div class="ping-result"><span class="text-dim">ping atılıyor...</span></div>`;
+  try {
+    const res = await fetch('/api/ping', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({target})
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      pingDiv.innerHTML = `<div class="error">${data.error}</div>`;
+      return;
+    }
+    if (data.alive) {
+      pingDiv.innerHTML = `<div class="ping-result"><span class="dot-small dot-alive"></span> <b>${data.ip}</b> ayakta &middot; ${data.latency_ms} ms</div>`;
+    } else {
+      pingDiv.innerHTML = `<div class="ping-result"><span class="dot-small dot-dead"></span> <b>${data.ip}</b> yanıt vermiyor (ICMP engellenmiş olabilir)</div>`;
+    }
+  } catch (e) {
+    pingDiv.innerHTML = `<div class="error">Bağlantı hatası</div>`;
+  }
+}
+
+async function loadHistory() {
+  const listDiv = document.getElementById('historyList');
+  try {
+    const res = await fetch('/api/history');
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      listDiv.innerHTML = `<div class="empty">Henüz tarama yapılmadı.</div>`;
+      return;
+    }
+    listDiv.innerHTML = data.map(h => `
+      <div class="history-item" onclick="viewHistoryScan('${h.scan_id}')">
+        <span>${h.target} <span class="history-meta">(${h.ip})</span></span>
+        <span>
+          <span class="status-tag ${h.status === 'cancelled' ? 'status-cancelled' : 'status-done'}">${h.status}</span>
+          <span class="history-meta">${h.open_count} açık port &middot; ${h.finished_at || ''}</span>
+        </span>
+      </div>
+    `).join('');
+  } catch (e) {
+    listDiv.innerHTML = `<div class="error">Geçmiş yüklenemedi</div>`;
+  }
+}
+
+async function viewHistoryScan(scanId) {
+  const res = await fetch(`/api/scan/${scanId}`);
+  const data = await res.json();
+  if (!res.ok) return;
+  currentScanId = scanId;
+  document.getElementById('progressSection').style.display = 'none';
+  renderResults(data.open_ports);
+  setupPostScanActions(data.status);
+}
+
+function setupPostScanActions(status) {
+  document.getElementById('postScanActions').style.display = 'flex';
+  document.getElementById('cancelBtn').style.display = status === 'running' ? 'inline-block' : 'none';
+  document.getElementById('exportJsonBtn').style.display = 'inline-block';
+  document.getElementById('exportCsvBtn').style.display = 'inline-block';
+}
+
+async function cancelScan() {
+  if (!currentScanId) return;
+  await fetch(`/api/scan/${currentScanId}/cancel`, { method: 'POST' });
+  document.getElementById('cancelBtn').disabled = true;
+  document.getElementById('cancelBtn').textContent = 'İptal ediliyor...';
+}
+
+function exportScan(fmt) {
+  if (!currentScanId) return;
+  window.open(`/api/scan/${currentScanId}/export.${fmt}`, '_blank');
+}
+
 async function resolveTarget() {
   const target = document.getElementById('resolveTarget').value.trim();
   const resultDiv = document.getElementById('resolveResult');
   resultDiv.innerHTML = '';
   if (!target) return;
+
+  resultDiv.innerHTML = `<div class="empty">çözümleniyor...</div>`;
 
   try {
     const res = await fetch('/api/resolve', {
@@ -270,14 +553,52 @@ async function resolveTarget() {
       resultDiv.innerHTML = `<div class="error">${data.error}</div>`;
       return;
     }
-    let html = `<div class="result-line">IP Adresi: <b>${data.ip}</b></div>`;
-    if (data.reverse_dns) {
-      html += `<div class="result-line">Reverse DNS: <b>${data.reverse_dns}</b></div>`;
-    }
-    resultDiv.innerHTML = html;
+    resultDiv.innerHTML = renderResolveResult(data);
   } catch (e) {
     resultDiv.innerHTML = `<div class="error">Bağlantı hatası</div>`;
   }
+}
+
+function renderResolveResult(data) {
+  let html = `<div class="result-line">Hostname: <b>${escapeHtml(data.hostname)}</b></div>`;
+
+  if (data.cname_chain && data.cname_chain.length > 0) {
+    const parts = data.cname_chain.map(c => escapeHtml(c.from)).concat([escapeHtml(data.cname_chain[data.cname_chain.length - 1].to)]);
+    html += `<div class="dns-section"><div class="dns-label">CNAME Zinciri</div>
+      <div class="cname-chain">${parts.join(' <span class="arrow">&rarr;</span> ')}</div></div>`;
+  }
+
+  if (data.a_records && data.a_records.length > 0) {
+    html += `<div class="dns-section"><div class="dns-label">A Kayıtları (IPv4) &middot; ${data.a_records.length} adet</div>
+      <div class="chip-row">${data.a_records.map(ip => {
+        const rdns = data.reverse_dns[ip];
+        const isPrimary = ip === data.primary_ip;
+        return `<span class="chip${isPrimary ? ' primary' : ''}">${ip}${rdns ? ` <span class="rdns">(${escapeHtml(rdns)})</span>` : ''}</span>`;
+      }).join('')}</div></div>`;
+  }
+
+  if (data.aaaa_records && data.aaaa_records.length > 0) {
+    html += `<div class="dns-section"><div class="dns-label">AAAA Kayıtları (IPv6) &middot; ${data.aaaa_records.length} adet</div>
+      <div class="chip-row">${data.aaaa_records.map(ip => `<span class="chip">${ip}</span>`).join('')}</div></div>`;
+  }
+
+  if (data.mx_records && data.mx_records.length > 0) {
+    html += `<div class="dns-section"><div class="dns-label">MX Kayıtları</div>
+      <div class="chip-row">${data.mx_records.map(mx => `<span class="chip">${escapeHtml(mx)}</span>`).join('')}</div></div>`;
+  }
+
+  if (data.ns_records && data.ns_records.length > 0) {
+    html += `<div class="dns-section"><div class="dns-label">NS Kayıtları</div>
+      <div class="chip-row">${data.ns_records.map(ns => `<span class="chip">${escapeHtml(ns)}</span>`).join('')}</div></div>`;
+  }
+
+  if (data.txt_records && data.txt_records.length > 0) {
+    html += `<div class="dns-section"><div class="dns-label">TXT Kayıtları</div>
+      <div class="chip-row">${data.txt_records.map(txt => `<span class="chip">${escapeHtml(txt)}</span>`).join('')}</div></div>`;
+  }
+
+  html += `<div class="engine-note">Motor: ${escapeHtml(data.dns_engine)}</div>`;
+  return html;
 }
 
 let pollInterval = null;
@@ -317,6 +638,8 @@ async function startScan() {
       return;
     }
 
+    currentScanId = data.scan_id;
+    document.getElementById('postScanActions').style.display = 'none';
     document.getElementById('progressSection').style.display = 'block';
     pollScan(data.scan_id);
   } catch (e) {
@@ -340,13 +663,16 @@ function pollScan(scanId) {
     document.getElementById('progressBar').style.width = pct + '%';
     document.getElementById('progressText').textContent = `${data.scanned} / ${data.total_ports} port tarandı`;
 
-    if (data.status === 'done') {
+    if (data.status === 'done' || data.status === 'cancelled') {
       clearInterval(pollInterval);
-      document.getElementById('statusText').textContent = `tamamlandı (${data.finished_at})`;
+      document.getElementById('statusText').textContent =
+        data.status === 'cancelled' ? `iptal edildi (${data.finished_at})` : `tamamlandı (${data.finished_at})`;
       renderResults(data.open_ports);
+      setupPostScanActions(data.status);
       const scanBtn = document.getElementById('scanBtn');
       scanBtn.disabled = false;
       scanBtn.textContent = 'Taramayı Başlat';
+      loadHistory();
     } else {
       document.getElementById('statusText').textContent = 'çalışıyor...';
     }
@@ -366,13 +692,233 @@ function renderResults(openPorts) {
 
   table.style.display = 'table';
   empty.style.display = 'none';
-  body.innerHTML = openPorts.map(p => `
+  body.innerHTML = openPorts.map(p => {
+    let sslHtml = '';
+    if (p.ssl) {
+      sslHtml = `<div class="ssl-badge">🔒 ${escapeHtml(p.ssl.common_name)} &middot; veren: ${escapeHtml(p.ssl.issuer)} &middot; son gün: ${escapeHtml(p.ssl.valid_until)}</div>`;
+    }
+    return `
     <tr>
       <td class="port">${p.port}</td>
       <td><span class="badge">${p.service}</span></td>
-      <td>${p.banner ? escapeHtml(p.banner) : '-'}</td>
+      <td>${p.banner ? escapeHtml(p.banner) : '-'}${sslHtml}</td>
     </tr>
+  `;
+  }).join('');
+}
+
+async function geoipTarget() {
+  const target = document.getElementById('resolveTarget').value.trim();
+  const geoDiv = document.getElementById('geoResult');
+  geoDiv.innerHTML = '';
+  if (!target) return;
+  geoDiv.innerHTML = `<div class="empty">sorgulanıyor...</div>`;
+  try {
+    const res = await fetch('/api/geoip', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({target})
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      geoDiv.innerHTML = `<div class="error">${data.error}</div>`;
+      return;
+    }
+    geoDiv.innerHTML = `
+      <div class="geo-grid">
+        <div class="geo-item"><div class="label">Ülke</div><div class="value">${escapeHtml(data.country || '-')}</div></div>
+        <div class="geo-item"><div class="label">Şehir</div><div class="value">${escapeHtml(data.city || '-')}</div></div>
+        <div class="geo-item"><div class="label">ISP</div><div class="value">${escapeHtml(data.isp || '-')}</div></div>
+        <div class="geo-item"><div class="label">Organizasyon</div><div class="value">${escapeHtml(data.org || '-')}</div></div>
+        <div class="geo-item"><div class="label">AS</div><div class="value">${escapeHtml(data.as || '-')}</div></div>
+      </div>`;
+  } catch (e) {
+    geoDiv.innerHTML = `<div class="error">Bağlantı hatası</div>`;
+  }
+}
+
+async function whoisLookup() {
+  const target = document.getElementById('whoisTarget').value.trim();
+  const errorDiv = document.getElementById('whoisError');
+  const resultDiv = document.getElementById('whoisResult');
+  const btn = document.getElementById('whoisBtn');
+  errorDiv.textContent = '';
+  resultDiv.innerHTML = '';
+  if (!target) {
+    errorDiv.textContent = 'Hedef boş olamaz';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Sorgulanıyor...';
+  try {
+    const res = await fetch('/api/whois', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({target})
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorDiv.textContent = data.error;
+    } else {
+      resultDiv.innerHTML = `<div class="mono-box">${escapeHtml(data.raw)}</div>`;
+    }
+  } catch (e) {
+    errorDiv.textContent = 'Bağlantı hatası';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sorgula';
+  }
+}
+
+async function runTraceroute() {
+  const target = document.getElementById('tracerouteTarget').value.trim();
+  const errorDiv = document.getElementById('tracerouteError');
+  const resultDiv = document.getElementById('tracerouteResult');
+  const btn = document.getElementById('tracerouteBtn');
+  errorDiv.textContent = '';
+  resultDiv.innerHTML = '';
+  if (!target) {
+    errorDiv.textContent = 'Hedef boş olamaz';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Çalışıyor... (biraz sürebilir)';
+  try {
+    const res = await fetch('/api/traceroute', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({target})
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorDiv.textContent = data.error;
+    } else {
+      resultDiv.innerHTML = `<div class="mono-box">${escapeHtml(data.output)}</div>`;
+    }
+  } catch (e) {
+    errorDiv.textContent = 'Bağlantı hatası';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Başlat';
+  }
+}
+
+let PORT_PRESETS_CACHE = null;
+
+async function loadPortPresets() {
+  try {
+    const res = await fetch('/api/port-presets');
+    PORT_PRESETS_CACHE = await res.json();
+    const labels = {web: 'Web', database: 'Veritabanı', remote: 'Uzak Erişim', mail: 'Mail', gaming: 'Oyun', top100: 'İlk 1024'};
+    const rowHtml = Object.keys(PORT_PRESETS_CACHE).map(key =>
+      `<button type="button" class="preset-btn" onclick="applyPreset('scanPorts','${key}')">${labels[key] || key}</button>`
+    ).join('');
+    document.getElementById('scanPresetRow').innerHTML = rowHtml;
+    document.getElementById('subnetPresetRow').innerHTML = Object.keys(PORT_PRESETS_CACHE).map(key =>
+      `<button type="button" class="preset-btn" onclick="applyPreset('subnetPorts','${key}')">${labels[key] || key}</button>`
+    ).join('');
+  } catch (e) { /* sessizce geç */ }
+}
+
+function applyPreset(fieldId, presetKey) {
+  if (!PORT_PRESETS_CACHE || !PORT_PRESETS_CACHE[presetKey]) return;
+  document.getElementById(fieldId).value = PORT_PRESETS_CACHE[presetKey];
+}
+
+let subnetPollInterval = null;
+let currentSubnetScanId = null;
+
+async function startSubnetScan() {
+  const cidr = document.getElementById('subnetCidr').value.trim();
+  const ports = document.getElementById('subnetPorts').value.trim();
+  const timeout = document.getElementById('subnetTimeout').value.trim();
+  const errorDiv = document.getElementById('subnetError');
+  const btn = document.getElementById('subnetBtn');
+
+  errorDiv.textContent = '';
+  document.getElementById('subnetResults').innerHTML = '';
+  document.getElementById('subnetCancelRow').style.display = 'none';
+
+  if (!cidr) {
+    errorDiv.textContent = 'CIDR boş olamaz';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Taranıyor...';
+
+  try {
+    const res = await fetch('/api/subnet-scan', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({cidr, ports, timeout})
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errorDiv.textContent = data.error;
+      btn.disabled = false;
+      btn.textContent = 'Alt Ağı Tara';
+      return;
+    }
+    currentSubnetScanId = data.scan_id;
+    document.getElementById('subnetProgressSection').style.display = 'block';
+    document.getElementById('subnetCancelRow').style.display = 'flex';
+    pollSubnetScan(data.scan_id);
+  } catch (e) {
+    errorDiv.textContent = 'Bağlantı hatası';
+    btn.disabled = false;
+    btn.textContent = 'Alt Ağı Tara';
+  }
+}
+
+function pollSubnetScan(scanId) {
+  if (subnetPollInterval) clearInterval(subnetPollInterval);
+  subnetPollInterval = setInterval(async () => {
+    const res = await fetch(`/api/subnet-scan/${scanId}`);
+    const data = await res.json();
+    if (!res.ok) {
+      clearInterval(subnetPollInterval);
+      return;
+    }
+    const pct = data.total_hosts ? Math.round((data.scanned_hosts / data.total_hosts) * 100) : 0;
+    document.getElementById('subnetProgressBar').style.width = pct + '%';
+    document.getElementById('subnetProgressText').textContent = `${data.scanned_hosts} / ${data.total_hosts} host tarandı`;
+
+    renderSubnetResults(data.hosts);
+
+    if (data.status === 'done' || data.status === 'cancelled') {
+      clearInterval(subnetPollInterval);
+      document.getElementById('subnetStatusText').textContent =
+        data.status === 'cancelled' ? `iptal edildi (${data.finished_at})` : `tamamlandı (${data.finished_at})`;
+      document.getElementById('subnetCancelRow').style.display = 'none';
+      const btn = document.getElementById('subnetBtn');
+      btn.disabled = false;
+      btn.textContent = 'Alt Ağı Tara';
+    } else {
+      document.getElementById('subnetStatusText').textContent = 'çalışıyor...';
+    }
+  }, 700);
+}
+
+function renderSubnetResults(hosts) {
+  const div = document.getElementById('subnetResults');
+  if (!hosts || hosts.length === 0) {
+    div.innerHTML = `<div class="empty">Şu ana kadar açık portlu host bulunamadı.</div>`;
+    return;
+  }
+  div.innerHTML = hosts.map(h => `
+    <div class="subnet-host">
+      <span class="ip">${h.ip}</span>
+      <div class="ports">${h.open_ports.map(p => `${p.port} (${p.service})`).join(', ')}</div>
+    </div>
   `).join('');
+}
+
+async function cancelSubnetScan() {
+  if (!currentSubnetScanId) return;
+  await fetch(`/api/subnet-scan/${currentSubnetScanId}/cancel`, { method: 'POST' });
+  document.getElementById('subnetCancelBtn').disabled = true;
+  document.getElementById('subnetCancelBtn').textContent = 'İptal ediliyor...';
 }
 
 function escapeHtml(str) {
@@ -380,6 +926,9 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+loadHistory();
+loadPortPresets();
 </script>
 </body>
 </html>

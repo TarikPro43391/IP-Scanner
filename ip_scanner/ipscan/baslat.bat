@@ -1,9 +1,9 @@
 @echo off
-title IP Scanner v0.1.0 - by TarikPro43391
+title IP Scanner v0.1.1 - by TarikPro43391
 color 0A
 
 echo ============================================
-echo   IP Scanner v0.1.0
+echo   IP Scanner v0.1.1
 echo   by TarikPro43391
 echo ============================================
 echo.
