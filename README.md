@@ -1,4 +1,4 @@
-**IP Scanner v0.1.0**
+**IP Scanner v0.1.1**
 *by TarikPro43391*
 
 Flask tabanlı, web arayüzlü IP çözümleme ve port tarama aracı. Domain/IP sorgulama, çoklu thread ile hızlı port tarama, servis tahmini ve banner grabbing özelliklerini tek panelde birleştirir. Sadece sahip olunan veya izin verilen sistemlerde test amaçlı kullanım için tasarlanmıştır.
